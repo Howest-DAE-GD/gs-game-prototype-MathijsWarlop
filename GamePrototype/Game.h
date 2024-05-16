@@ -50,9 +50,10 @@ private:
 	Point2f	m_EnemyPos{ Point2f(00.f, 00.f) };
 	int		m_EnemySize{ 50 };
 	float	m_EnemySpeed{ 450.0f };
+	float	m_EnemySpeedIncrease{ 1.003 };
 	int gameState{ 1 };
 	int m_attacksize{ 50 };
-
+	
 
 	int m_Score{};
 	TTF_Font* m_pConsolasFont;
@@ -62,9 +63,16 @@ private:
 	int m_Health{10};
 	Texture* m_pSwitchHp;
 	string m_StringHp = "HEALTH: 10";
+	Texture* m_pSwitchPressR;
+	string m_PressR = "PRESS R TO RETRY";
 
 	Point2f m_CoinPos;
 	int m_CoinSize{ 20 };
+
+	Point2f m_GreenPos;
+	int		m_GreenSize{ 30 };
+	int		m_GreenCounter{ 1500 };
+	bool	m_GreenActive{ false };
 
 
 	// FUNCTIONS

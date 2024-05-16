@@ -20,12 +20,16 @@ Game::~Game( )
 
 void Game::Initialize( )
 {
+	std::cout << "WASD to move" << std::endl << "arrow keys to attack";
+
 	m_pConsolasFont = TTF_OpenFont("Fonts/Inconsolata-Regular.ttf", 24);
 
 	m_pSwitchText = new Texture(m_StringCounter, m_pConsolasFont, Color4f{ 1,1,1,1 });
 	m_pSwitchHp = new Texture(m_StringHp, m_pConsolasFont, Color4f{ 1,1,1,1 });
+	m_pSwitchPressR = new Texture(m_PressR, m_pConsolasFont, Color4f{ 1,1,1,1 });
 
-	m_CoinPos = Point2f( rand() % 750 + 50.f , rand() % 400 + 50.f) ;
+	m_CoinPos = Point2f( rand() % 650 + 100.f , rand() % 300 + 100.f) ;
+	m_GreenPos = Point2f(rand() % 650 + 100.f, rand() % 300 + 100.f);
 }
 
 void Game::Cleanup( )
@@ -33,6 +37,7 @@ void Game::Cleanup( )
 	TTF_CloseFont(m_pConsolasFont);
 	delete m_pSwitchText;
 	delete m_pSwitchHp;
+	delete m_pSwitchPressR;
 }
 
 void Game::Update(float elapsedSec)
@@ -50,6 +55,7 @@ void Game::Update(float elapsedSec)
 	else 
 	{
 		m_StringCounter = "Final Score: " + to_string(m_Score);
+		delete m_pSwitchText;
 		m_pSwitchText = new Texture(m_StringCounter, m_pConsolasFont, Color4f{ 1,1,1,1 });
 	}
 
@@ -72,6 +78,17 @@ void Game::Update(float elapsedSec)
 	// SETTING TIMER
 	if (gameState == 1)
 	{
+		if(m_GreenCounter>0 && m_Health < 10)
+		{
+			m_GreenCounter-= 1*elapsedSec;
+			m_GreenActive = false;
+		}
+		else if(m_Health < 10&& m_GreenCounter<=0)
+		{
+			m_GreenCounter = 0;
+			m_GreenActive = true ;
+		}
+
 	if (m_SwordTimer == 0)
 	{
 		//left
@@ -131,7 +148,7 @@ void Game::Update(float elapsedSec)
 		if (utils::IsOverlapping(Rectf(m_EnemyPos.x - m_EnemySize / 2, m_EnemyPos.y - m_EnemySize / 2, m_EnemySize, m_EnemySize), Rectf(m_Pos.x - (m_PlayerSize / 2 + m_attacksize), m_Pos.y - m_attacksize / 2 - m_PlayerSize / 2, m_attacksize, m_attacksize + m_PlayerSize)))
 		{
 			m_Score += 10;
-			m_EnemySpeed *= 1.01;
+			m_EnemySpeed *= m_EnemySpeedIncrease;
 			//m_PlayerSpeed *= 0.998;
 			int randomNumber = rand() % 4;
 			if (randomNumber == 0)
@@ -165,7 +182,7 @@ void Game::Update(float elapsedSec)
 		{
 			//m_PlayerSpeed *= 0.998;
 			m_Score += 10;
-			m_EnemySpeed *= 1.01;
+			m_EnemySpeed *= m_EnemySpeedIncrease;
 			int randomNumber = rand() % 4;
 			if (randomNumber == 0)
 			{
@@ -197,7 +214,7 @@ void Game::Update(float elapsedSec)
 		{
 			//m_PlayerSpeed *= 0.998;
 			m_Score += 10;
-			m_EnemySpeed *= 1.01;
+			m_EnemySpeed *= m_EnemySpeedIncrease;
 			int randomNumber = rand() % 4;
 			if (randomNumber == 0)
 			{
@@ -230,7 +247,7 @@ void Game::Update(float elapsedSec)
 		{
 			//m_PlayerSpeed *= 0.998;
 			m_Score += 10;
-			m_EnemySpeed *= 1.01;
+			m_EnemySpeed *= m_EnemySpeedIncrease;
 			int randomNumber = rand() % 4;
 			if (randomNumber == 0)
 			{
@@ -267,12 +284,12 @@ void Game::Update(float elapsedSec)
 			--m_Health;
 			if (m_Health < 1)
 			{
-				std::cout << "Press R to retry" << std::endl;
+				//std::cout << "Press R to retry" << std::endl;
 				GameOver();
 			}
 
-			m_PlayerSpeed *= 0.9;
-			m_PlayerSize += 10;
+			m_PlayerSpeed *= 0.95;
+			m_PlayerSize += 12;
 
 
 			int randomNumber = (rand() % 4);
@@ -304,8 +321,25 @@ void Game::Update(float elapsedSec)
 			m_Pos.y - m_PlayerSize / 2 < m_CoinPos.y - m_CoinSize / 2 + m_CoinSize &&
 			m_Pos.y - m_PlayerSize / 2 + m_PlayerSize > m_CoinPos.y - m_CoinSize / 2)
 		{
-			m_CoinPos = Point2f(rand() % 750 + 50.f, rand() % 400 + 50.f);;
+			m_CoinPos = Point2f(rand() % 650 + 100.f, rand() % 300 + 100.f);;
 			m_Score += 50;
+		}
+		//green/cyan player collision
+		if (m_GreenActive)
+		{
+			if (m_Pos.x - m_PlayerSize / 2 < m_GreenPos.x - m_GreenSize / 2 + m_GreenSize &&
+				m_Pos.x - m_PlayerSize / 2 + m_PlayerSize > m_GreenPos.x - m_GreenSize / 2 &&
+				m_Pos.y - m_PlayerSize / 2 < m_GreenPos.y - m_GreenSize / 2 + m_GreenSize &&
+				m_Pos.y - m_PlayerSize / 2 + m_PlayerSize > m_GreenPos.y - m_GreenSize / 2)
+			{
+				m_GreenPos = Point2f(rand() % 650 + 100.f, rand() % 300 + 100.f);;
+				m_Health += 1;
+				m_PlayerSpeed /= 0.95;
+				m_PlayerSize -= 12;
+
+				m_GreenCounter = rand() % 1000 + 1000.f;
+				m_GreenActive = false;
+			}
 		}
 	}
 }
@@ -316,17 +350,26 @@ void Game::Draw( ) const
 
 	if (gameState == 1)
 	{
+
+		// draw coin
+		utils::SetColor(Color4f(1.f, 1.f, 0.f, 1.f));
+		utils::FillRect(m_CoinPos.x - m_CoinSize / 2, m_CoinPos.y - m_CoinSize / 2, m_CoinSize, m_CoinSize);
+
+		if (m_GreenActive)
+		{
+			utils::SetColor(Color4f(0.f, 1.f, 1.f, 1.f));
+			utils::FillRect(m_GreenPos.x - m_GreenSize / 2, m_GreenPos.y - m_GreenSize / 2, m_GreenSize, m_GreenSize);
+		}
+
 		//Player
 		utils::SetColor(Color4f(0.f, 1.f, 0.f, 1.f));
 		utils::FillRect(m_Pos.x - m_PlayerSize / 2, m_Pos.y - m_PlayerSize / 2, m_PlayerSize, m_PlayerSize);
+
 
 		// draw enemies
 		utils::SetColor(Color4f(1.f, 0.f, 0.f, 1.f));
 		utils::FillRect(m_EnemyPos.x - m_EnemySize / 2, m_EnemyPos.y - m_EnemySize / 2, m_EnemySize, m_EnemySize);
 
-		// draw coin
-		utils::SetColor(Color4f(1.f, 1.f, 0.f, 1.f));
-		utils::FillRect(m_CoinPos.x - m_CoinSize / 2, m_CoinPos.y - m_CoinSize / 2, m_CoinSize, m_CoinSize);
 
 		
 		//sword
@@ -369,6 +412,7 @@ void Game::Draw( ) const
 	else if (gameState == 0)
 	{
 		m_pSwitchText->Draw(Point2f(330, 350));
+		m_pSwitchPressR->Draw(Point2f(330, 150));
 	}
 
 	//utils::FillRect(m_Pos.x - m_PlayerSize / 2, m_Pos.y - m_PlayerSize / 2, m_PlayerSize, m_PlayerSize);
