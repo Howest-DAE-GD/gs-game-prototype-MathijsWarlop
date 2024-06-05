@@ -50,7 +50,7 @@ private:
 	Point2f	m_EnemyPos{ Point2f(00.f, 00.f) };
 	int		m_EnemySize{ 50 };
 	float	m_EnemySpeed{ 450.0f };
-	float	m_EnemySpeedIncrease{ 1.003 };
+	float	m_EnemySpeedIncrease{ 1.002 };
 	int gameState{ 1 };
 	int m_attacksize{ 50 };
 	

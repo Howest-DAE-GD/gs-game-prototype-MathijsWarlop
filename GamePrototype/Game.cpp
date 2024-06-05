@@ -322,7 +322,7 @@ void Game::Update(float elapsedSec)
 			m_Pos.y - m_PlayerSize / 2 + m_PlayerSize > m_CoinPos.y - m_CoinSize / 2)
 		{
 			m_CoinPos = Point2f(rand() % 650 + 100.f, rand() % 300 + 100.f);;
-			m_Score += 50;
+			m_Score += 150;
 		}
 		//green/cyan player collision
 		if (m_GreenActive)
